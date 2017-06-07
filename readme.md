@@ -20,3 +20,7 @@ Details in package.json
 
 ## Folder structure
 Provided in folder.txt
+
+## Google OAuth
+Create Google API and add client Id and client Secret in "config/auth.js"
+Add "http://localhost:8080/auth/google/callback" to redirect url

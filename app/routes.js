@@ -32,6 +32,16 @@ module.exports = function(app, passport) {
 		req.logout()
 		res.redirect('/')
 	})
+
+	// google routes
+	app.get('/auth/google', passport.authenticate('google', {
+		scope: ['profile', 'email']
+	}))
+
+	app.get('/auth/google/callback', passport.authenticate('google', {
+		successRedirect: '/profile',
+		failureRedirect: '/'
+	}))
 }
 
 function isLoggedIn (req, res, next) {
