@@ -1,6 +1,7 @@
 // load all the things we need
 var LocalStrategy = require('passport-local').Strategy
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+var FacebookStrategy = require('passport-facebook').Strategy
 
 // load up the user model
 var User = require('../app/models/user')
@@ -32,10 +33,10 @@ module.exports = function(passport) {
 				'local.email': email
 			}, function(err, user) {
 				if(err) return done(err)
-				if(user) 
+				if(user)
 					return done(null, false, req.flash('signupMessage', 'That email is already taken.'))
 				else {
-					
+
 					var newUser = new User()
 					newUser.local.email = email
 					newUser.local.password = newUser.generateHash(password)
@@ -71,15 +72,48 @@ module.exports = function(passport) {
 	}))
 
 	// Google
-	passport.use(new GoogleStrategy({
-		clientID: configAuth.googleAuth.clientID,
-		clientSecret: configAuth.googleAuth.clientSecret,
-		callbackURL: configAuth.googleAuth.callbackURL
-	}, 
+	// passport.use(new GoogleStrategy({
+	// 	clientID: configAuth.googleAuth.clientID,
+	// 	clientSecret: configAuth.googleAuth.clientSecret,
+	// 	callbackURL: configAuth.googleAuth.callbackURL
+	// },
+	// function(token, refreshToken, profile, done) {
+	// 	process.nextTick(function() {
+	// 		User.findOne({
+	// 			'google.id': profile.id
+	// 		}, function(err, user) {
+	// 			if(err)
+	// 				return done(err)
+	// 			if(user)
+	// 				return done(null, user)
+	// 			else {
+	// 				var newUser = new User()
+	//
+	// 				newUser.google.id = profile.id
+	// 				newUser.google.token = token
+	// 				newUser.google.name = profile.displayName
+	// 				newUser.google.email = profile.emails[0].value
+	//
+	// 				newUser.save(function(err) {
+	// 					if(err)
+	// 						throw err
+	// 					return done(null, newUser)
+	// 				})
+	// 			}
+	// 		})
+	// 	})
+	// }))
+
+	// Facebook
+	passport.use(new FacebookStrategy({
+		clientID: configAuth.facebookAuth.clientID,
+		clientSecret: configAuth.facebookAuth.clientSecret,
+		callbackURL: configAuth.facebookAuth.callbackURL
+	},
 	function(token, refreshToken, profile, done) {
 		process.nextTick(function() {
 			User.findOne({
-				'google.id': profile.id
+				'facebook.id': profile.id
 			}, function(err, user) {
 				if(err)
 					return done(err)
@@ -88,10 +122,10 @@ module.exports = function(passport) {
 				else {
 					var newUser = new User()
 
-					newUser.google.id = profile.id
-					newUser.google.token = token
-					newUser.google.name = profile.displayName
-					newUser.google.email = profile.emails[0].value
+					newUser.facebook.id = profile.id
+					newUser.facebook.token = token
+					newUser.facebook.name = profile.name.givenName + ' ' + profile.name.familyName
+					newUser.facebook.email = profile.emails[0].value
 
 					newUser.save(function(err) {
 						if(err)
